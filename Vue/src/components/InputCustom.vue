@@ -48,6 +48,9 @@ const currentValue = defineModel<string | number | null>(),
   font-size: var(--font-size-default);
   width: var(--dimension-input);
   box-sizing: border-box;
+  &:hover {
+    border-color: var(--color-border-hover-1);
+  }
 }
 
 .input-custom__error {

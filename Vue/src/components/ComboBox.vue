@@ -118,7 +118,10 @@ onMounted(() => {
     @focusin="$emit('focus')"
     :class="{ 'select-custom__error': error }"
   >
-    {{ currentValue ? options.find((option) => option.value === currentValue)?.title : placeholder }}
+    <span class="select-custom__title">
+      {{ currentValue ? options.find((option) => option.value === currentValue)?.title : placeholder }}
+    </span>
+    <span class="select-custom__v-mark" :class="{ open: openDropdown, close: !openDropdown }">V</span>
   </button>
 
   <template v-if="teleportTarget">
@@ -150,6 +153,8 @@ onMounted(() => {
 
 <style scoped>
 .select-custom {
+  display: flex;
+  gap: var(--spacing-inputs);
   position: relative;
   padding: var(--spacing-inputs);
   border: var(--border-width-standard) solid var(--color-border-default);
@@ -158,6 +163,31 @@ onMounted(() => {
   font-size: var(--font-size-default);
   width: var(--dimension-input);
   box-sizing: border-box;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--color-border-hover-1);
+  }
+
+  .select-custom__title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .select-custom__v-mark {
+    width: 15px;
+    margin-left: auto;
+    transition: transform 0.25s;
+
+    &.open {
+      transform: rotate(-180deg);
+    }
+
+    &.close {
+      transform: rotate(-360deg);
+    }
+  }
 }
 
 .select-custom__error {

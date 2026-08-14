@@ -5,10 +5,12 @@ defineEmits<{
 }>();
 
 const {
+  disabled = false,
   arLabelName = 'label-custom',
   mode = 'default',
   active = false,
 } = defineProps<{
+  disabled?: boolean;
   arLabelName?: string;
   mode?: 'default' | 'delete';
   active?: boolean;
@@ -23,9 +25,10 @@ defineExpose({
 
 <template>
   <button
+    :disabled="disabled"
     ref="buttoncustom"
     class="button-custom"
-    :class="{ 'mode-delete': mode === 'delete', active: active }"
+    :class="{ 'mode-delete': mode === 'delete', active: active, 'disabled-button': disabled }"
     type="button"
     @click.stop="$emit('click', $event)"
     @keydown.stop
@@ -49,16 +52,22 @@ defineExpose({
   align-items: center;
   justify-content: center;
   transition: border-color 0.3s ease;
+
   &.active {
     border-color: var(--color-border-accent-1);
   }
-  &:hover {
+  &:hover:not(.mode-delete) {
     border-color: var(--color-border-hover-1);
   }
   &:focus-visible {
     outline: none;
     border-color: transparent;
     box-shadow: 2px 2px 0 3px var(--color-border-accent-1);
+  }
+
+  &.disabled-button {
+    border-color: var(--color-disabled);
+    color: var(--color-disabled);
   }
 }
 

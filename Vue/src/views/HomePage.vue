@@ -9,7 +9,7 @@ import InputCustom from '@/components/InputCustom.vue';
 import ButtonCustom from '@/components/ButtonCustom.vue';
 import InventoryList from '@/components/InventoryList.vue';
 
-const { shouldLoad, item, count, category, itemError, addItemMutation, clearInventoryMutation } = useInventory();
+const { shouldLoad, items, item, count, category, itemError, addItemMutation, clearInventoryMutation } = useInventory();
 
 const clearErrorOnFocus = () => {
   itemError.value = false;
@@ -18,8 +18,12 @@ const clearErrorOnFocus = () => {
 const openConfirm = ref<boolean>(false);
 
 const confirmClear = () => {
-  openConfirm.value = true;
   clearInventoryMutation.mutate();
+  openConfirm.value = false;
+};
+
+const openConfirmClear = () => {
+  if (items.value.length) openConfirm.value = true;
 };
 
 onMounted(() => (shouldLoad.value = true));
@@ -51,7 +55,9 @@ onMounted(() => (shouldLoad.value = true));
 
       <div class="overview-page__elements-actions">
         <ButtonCustom ar-label-name="Gegenstand hinzufügen" @click="addItemMutation.mutateAsync()">Hinzufügen</ButtonCustom>
-        <ButtonCustom ar-label-name="Gegenstände löschen" @click="confirmClear">Liste leeren</ButtonCustom>
+        <ButtonCustom :disabled="!items.length" ar-label-name="Gegenstände löschen" @click="openConfirmClear"
+          >Liste leeren</ButtonCustom
+        >
       </div>
     </fieldset>
 
@@ -59,6 +65,8 @@ onMounted(() => (shouldLoad.value = true));
 
     <Modal :open="openConfirm" @close="openConfirm = false">
       <p>Wirklich löschen?</p>
+      <ButtonCustom @click="confirmClear">Ja</ButtonCustom>
+      <ButtonCustom @click="openConfirm = false">Nein</ButtonCustom>
     </Modal>
   </div>
 </template>

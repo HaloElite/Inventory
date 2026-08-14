@@ -24,5 +24,7 @@
     --color-border-accent-2: var(--primitive-red);
     --color-border-hover-1: var(--primitive-green-light);
     --color-border-hover-2: var(--primitive-red-light);
+
+    --color-disabled: var(--primitive-green-ambient);
   }
 }

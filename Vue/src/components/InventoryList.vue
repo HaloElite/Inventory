@@ -4,7 +4,7 @@ import { CATEGORY_OPTIONS } from '@/helper/constants';
 import type { Category, inventoryItem } from '@/types/inventoryTypes';
 import { useBreakpoint } from '@/composables/useBreakpoints';
 
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 import { useInventory } from '@/composables/useInventory';
 import { formatDate } from '@/helper/dateFormatter';
