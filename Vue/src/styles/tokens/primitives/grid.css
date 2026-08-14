@@ -1,0 +1,6 @@
+@layer primitives {
+  :root {
+    --grid-fr-base: 1fr;
+    --grid-fr-large: 7fr;
+  }
+}

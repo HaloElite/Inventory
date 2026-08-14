@@ -1,0 +1,8 @@
+@layer semantics {
+  :root {
+    /* Widths */
+    --border-width-standard: var(--border-width-base);
+    --border-width-badge: var(--border-width-slim);
+    --border-width-none: var(--border-width-none);
+  }
+}

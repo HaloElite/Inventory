@@ -1,0 +1,13 @@
+@layer semantics {
+  :root {
+    --dimension-table-cell: var(--dimension-s);
+    --dimension-input: var(--dimension-m);
+    --dimension-control-s: var(--dimension-xs);
+    --dimension-badge: var(--dimension-xs);
+    --dimension-icon: var(--dimension-xs);
+    --dimension-icon-mobile: var(--dimension-xxs);
+    --dimension-nav-toggle: var(--dimension-base);
+    --dimension-input-full: var(--dimension-full);
+    --dimension-button-full: var(--dimension-full);
+  }
+}

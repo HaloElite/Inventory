@@ -1,0 +1,15 @@
+@layer primitives {
+  :root {
+    /* 8-bit dark mode — green terminal palette */
+    --primitive-black: #000000;
+    --primitive-blue: #2266ff;
+    --primitive-orange: #ff9900;
+    --primitive-red: #ff1133;
+    --primitive-green: #00ff00;
+    --primitive-white-bright: #e8eeff;
+    --primitive-surface: #13131f;
+    --primitive-green-ambient: color-mix(in srgb, var(--primitive-green) 14%, transparent);
+    --primitive-green-light: color-mix(in srgb, var(--primitive-green) 10%, var(--primitive-black));
+    --primitive-red-light: color-mix(in srgb, var(--primitive-red) 10%, var(--primitive-black));
+  }
+}

@@ -1,0 +1,10 @@
+@layer primitives {
+  :root {
+    --dimension-xxs: 25px;
+    --dimension-xs: 50px;
+    --dimension-s: 9rem;
+    --dimension-m: 13rem;
+    --dimension-base: 1rem;
+    --dimension-full: 100%;
+  }
+}

@@ -1,0 +1,42 @@
+@layer primitives {
+  :root {
+    --pk-font-sans: 'Press Start 2P', 'Arial Narrow', Arial, sans-serif;
+
+    --font-size-xxs: 0.625rem;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+    --font-size-5xl: 3rem;
+    --font-size-6xl: 3.75rem;
+    --font-size-7xl: 4.5rem;
+    --font-size-8xl: 6rem;
+    --font-size-9xl: 8rem;
+
+    --line-height-xxs: 0.75rem;
+    --line-height-xs: 1rem;
+    --line-height-sm: 1.25rem;
+    --line-height-md: 1.5rem;
+    --line-height-lg: 1.75rem;
+    --line-height-xl: 2rem;
+    --line-height-2xl: 2.25rem;
+    --line-height-3xl: 2.5rem;
+    --line-height-4xl: 2.75rem;
+    --line-height-5xl: 3rem;
+    --line-height-6xl: 3.25rem;
+    --line-height-7xl: 3.5rem;
+    --line-height-8xl: 4rem;
+    --line-height-9xl: 5rem;
+
+    --weight-thin: 100;
+    --weight-extralight: 200;
+    --weight-light: 300;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+  }
+}

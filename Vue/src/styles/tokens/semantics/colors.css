@@ -1,0 +1,28 @@
+@layer semantics {
+  :root {
+    --color-bg-main: var(--primitive-black);
+    --color-bg-accent-1: var(--primitive-green);
+    --color-bg-accent-1-dark: var(--primitive-green-ambient);
+    --color-bg-accent-1-light: var(--primitive-green-light);
+    --color-bg-accent-2: var(--primitive-red);
+    --color-bg-accent-2-light: var(--primitive-red-light);
+    --color-bg-table-row-hover: var(--primitive-green-light);
+    --color-bg-accent-1-hover: var(--primitive-green-ambient);
+
+    --color-text-default: var(--primitive-green);
+    --color-text-inverted: var(--primitive-white-bright);
+    --color-text-accent-2: var(--primitive-red);
+    --color-text-accent-3: var(--primitive-blue);
+    --color-text-info: var(--primitive-orange);
+
+    --color-green-dark: var(--primitive-green);
+    --color-yellow-dark: var(--primitive-orange);
+    --color-red-dark: var(--primitive-red);
+
+    --color-border-default: var(--primitive-green);
+    --color-border-accent-1: var(--primitive-blue);
+    --color-border-accent-2: var(--primitive-red);
+    --color-border-hover-1: var(--primitive-green-light);
+    --color-border-hover-2: var(--primitive-red-light);
+  }
+}

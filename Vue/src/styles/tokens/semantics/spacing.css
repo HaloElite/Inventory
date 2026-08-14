@@ -1,0 +1,25 @@
+@layer semantics {
+  :root {
+    --spacing-page: var(--spacing-xl);
+    --spacing-section: var(--spacing-lg);
+    --spacing-component: var(--spacing-md);
+    --spacing-button: var(--spacing-sm);
+    --spacing-inputs: var(--spacing-sm);
+    --spacing-table-header: var(--spacing-md);
+
+    --spacing-list-big: var(--spacing-md);
+    --spacing-list-medium: var(--spacing-sm);
+    --spacing-list-minimal: var(--spacing-xs);
+
+    --margin-page: var(--spacing-xl);
+    --margin-section: var(--spacing-lg);
+    --margin-component: var(--spacing-md);
+
+    --spacing-nav-list: var(--spacing-none);
+
+    --padding-page: var(--spacing-lg);
+    --padding-element: var(--spacing-sm);
+    --padding-element-thin: var(--spacing-sm);
+    --padding-element-large: var(--spacing-md);
+  }
+}

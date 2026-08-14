@@ -1,0 +1,11 @@
+@layer primitives {
+  :root {
+    --radius-none: 0;
+    --radius-base: 0.5rem;
+    --radius-full: 9999px;
+
+    --border-width-none: 0;
+    --border-width-slim: 2px;
+    --border-width-base: 4px;
+  }
+}

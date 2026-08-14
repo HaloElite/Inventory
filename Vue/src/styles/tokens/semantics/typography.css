@@ -1,0 +1,25 @@
+@layer semantics {
+  :root {
+    --text-heading: var(--font-size-xl);
+    --text-sub-heading: var(--font-size-lg);
+    --text-base: var(--font-size-md);
+
+    --line-height-heading: var(--line-height-xl);
+    --line-height-sub-heading: var(--line-height-lg);
+    --line-height-base: var(--line-height-md);
+    --line-height-button: var(--line-height-xxs);
+    --line-height-button-small: var(--line-height-xxs);
+    --line-height-item-small: var(--line-height-xxs);
+
+    --weight-heading: var(--weight-semibold);
+    --weight-sub-heading: var(--weight-semibold);
+    --weight-base: var(--weight-medium);
+
+    --font-family-page: var(--pk-font-sans);
+
+    --font-size-default: var(--font-size-xs);
+    --font-size-icon: var(--font-size-2xl);
+    --font-size-button: var(--font-size-xs);
+    --font-size-mobile: var(--font-size-xxs);
+  }
+}
