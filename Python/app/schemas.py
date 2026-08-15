@@ -13,6 +13,7 @@ MAX_TITLE_LENGTH = 120
 MAX_CATEGORY_LENGTH = 60
 MAX_IMAGE_LENGTH = 255
 MAX_COUNT = 1_000_000
+MAX_LOCATION_NAME_LENGTH = 80
 
 DEFAULT_CATEGORY = "general"
 DEFAULT_CONDITION = "new"
@@ -60,6 +61,8 @@ class ItemCreate(_ItemBase):
     condition: Condition = DEFAULT_CONDITION
     category: str = Field(default=DEFAULT_CATEGORY, min_length=1, max_length=MAX_CATEGORY_LENGTH)
     image: Optional[str] = Field(default=None, max_length=MAX_IMAGE_LENGTH)
+    # None = keinem Lagerort zugeordnet.
+    location_id: Optional[int] = Field(default=None, ge=1)
 
     @field_validator("condition", mode="before")
     @classmethod
@@ -75,11 +78,34 @@ class ItemUpdate(_ItemBase):
     # None = Feld nicht mitgeschickt -> bestehender Wert bleibt erhalten.
     condition: Optional[Condition] = None
     image: Optional[str] = Field(default=None, max_length=MAX_IMAGE_LENGTH)
+    # Wie bei LocationUpdate: weggelassen = unveraendert, null = Ort entfernen.
+    # Die Unterscheidung laeuft ueber model_fields_set.
+    location_id: Optional[int] = Field(default=None, ge=1)
 
     @field_validator("condition", mode="before")
     @classmethod
     def _normalise_condition(cls, value):
         return _normalise_token(value, None)
+
+
+class LocationCreate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+    name: str = Field(min_length=1, max_length=MAX_LOCATION_NAME_LENGTH)
+    # None = Ort liegt auf oberster Ebene.
+    parent_id: Optional[int] = Field(default=None, ge=1)
+
+
+class LocationUpdate(LocationCreate):
+    """Wie LocationCreate, aber parent_id unterscheidet drei Faelle.
+
+    Feld weggelassen  -> bisheriges Elternteil bleibt
+    parent_id: null   -> Ort wandert auf die oberste Ebene
+    parent_id: <id>   -> Ort wandert unter diesen Ort
+
+    Die Unterscheidung zwischen "weggelassen" und "null" laeuft ueber
+    model_fields_set, weil beide sonst als None ankaemen.
+    """
 
 
 def format_validation_errors(exc):

@@ -27,6 +27,18 @@ def client(tmp_path):
 
 
 @pytest.fixture()
+def location(client):
+    def _location(name, **overrides):
+        body = {"name": name}
+        body.update(overrides)
+        response = client.post("/add-location", json=body)
+        assert response.status_code == 201, response.get_json()
+        return response.get_json()
+
+    return _location
+
+
+@pytest.fixture()
 def add(client):
     def _add(**overrides):
         body = {"item": "Spaten", "count": 3}

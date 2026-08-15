@@ -7,16 +7,20 @@ from werkzeug.exceptions import HTTPException
 class ApiError(Exception):
     """Erwarteter Client-Fehler mit passendem HTTP-Status."""
 
-    def __init__(self, message, status=400, details=None):
+    def __init__(self, message, status=400, details=None, extra=None):
         super().__init__(message)
         self.message = message
         self.status = status
         self.details = details
+        # Zusaetzliche Felder auf oberster Ebene der Antwort, z. B. Zaehler,
+        # die dem Client sagen, warum eine Aktion blockiert wurde.
+        self.extra = extra or {}
 
     def to_response(self):
         payload = {"error": self.message}
         if self.details:
             payload["details"] = self.details
+        payload.update(self.extra)
         return jsonify(payload), self.status
 
 
