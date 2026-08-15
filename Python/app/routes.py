@@ -1,94 +1,160 @@
-import time
+import sqlite3
+
+from flask import current_app, jsonify, request
 
 from app import app
-from app.db import get_db
-from flask import request
+from app.db import DEFAULT_IMAGE, ITEM_COLUMNS, get_db, serialise_item
+from app.errors import ApiError
+from app.schemas import ItemCreate, ItemUpdate, format_validation_errors
+from pydantic import ValidationError
 
+
+# ---------------------------------------------------------------------------
+#   Helfer
+# ---------------------------------------------------------------------------
+def _parse_body(model):
+    """JSON-Body einlesen und gegen das pydantic-Modell validieren."""
+    data = request.get_json(silent=True)
+
+    if not isinstance(data, dict):
+        raise ApiError("Request body must be a JSON object", 400)
+
+    try:
+        return model.model_validate(data)
+    except ValidationError as exc:
+        raise ApiError("Invalid input", 400, details=format_validation_errors(exc)) from exc
+
+
+def _pagination_args():
+    """Optionale ?limit=&offset= Parameter lesen. Ohne limit wird alles geliefert."""
+    raw_limit = request.args.get("limit")
+    raw_offset = request.args.get("offset", "0")
+
+    if raw_limit is None:
+        return None, 0
+
+    try:
+        limit = int(raw_limit)
+        offset = int(raw_offset)
+    except ValueError as exc:
+        raise ApiError("'limit' and 'offset' must be integers", 400) from exc
+
+    max_page_size = current_app.config["MAX_PAGE_SIZE"]
+
+    if not 1 <= limit <= max_page_size:
+        raise ApiError(f"'limit' must be between 1 and {max_page_size}", 400)
+    if offset < 0:
+        raise ApiError("'offset' must not be negative", 400)
+
+    return limit, offset
+
+
+def _fetch_item(db, item_id):
+    return db.execute(f"SELECT {ITEM_COLUMNS} FROM inventory WHERE id = ?", (item_id,)).fetchone()
+
+
+def _find_title_conflict(db, title, exclude_id=None):
+    """Titel-Duplikat case-insensitiv suchen (Fallback fuer DBs ohne Unique-Index)."""
+    if exclude_id is None:
+        sql = "SELECT id FROM inventory WHERE title = ? COLLATE NOCASE"
+        params = (title,)
+    else:
+        sql = "SELECT id FROM inventory WHERE title = ? COLLATE NOCASE AND id != ?"
+        params = (title, exclude_id)
+
+    return db.execute(sql, params).fetchone()
+
+
+# ---------------------------------------------------------------------------
+#   Routen
+# ---------------------------------------------------------------------------
 @app.route("/get-inventory")
 def get_items():
     db = get_db()
-    
-    items = db.execute("SELECT * FROM inventory").fetchall()
-    
-    return [dict(row) for row in items], 200
+    limit, offset = _pagination_args()
+
+    sql = f"SELECT {ITEM_COLUMNS} FROM inventory ORDER BY id"
+    params = ()
+
+    if limit is not None:
+        sql += " LIMIT ? OFFSET ?"
+        params = (limit, offset)
+
+    items = db.execute(sql, params).fetchall()
+
+    return jsonify([serialise_item(row) for row in items]), 200
+
 
 @app.route("/add-inventory", methods=["POST"])
 def add_item():
-    data = request.get_json()
-    item = data.get("item")
-    count = int(data.get("count"))
-    condition = data.get("condition", "new").lower()  # Default to 'new' if not provided
-    category = data.get("category", "general").lower()  # Default to 'general' if not provided
-    image = data.get("image")
-
-    if len(item) == 0 or count <= 0:
-        return {"error": "Invalid input"}, 200
-    
-    db = get_db()
-    
-    # Check if item already exists
-    exists = db.execute(f"SELECT * FROM inventory WHERE title = ?", (item,)).fetchall()
-    
-    rows = [dict(row) for row in exists]
-
-    if not len(rows) > 0:
-        db.execute("INSERT INTO inventory (title, count, condition, category) VALUES (?, ?, ?, ?)", (item, count, condition, category))
-        
-        if image:
-            db.execute("UPDATE inventory SET image = ? WHERE title = ?", (image, item))
-        db.commit()
-    else:
-        return {"error": "Item already exists"}, 200
-
-
-    return {"Item successfully added": True}, 201
-
-@app.route("/update-item/<int:id>", methods=["PUT"])
-def update_item(id):
-    data = request.get_json()
-    title = data.get("title")
-    count = int(data.get("count"))  # 'count' value may be a string
-    category = data.get("category", "general").lower()  # Default to 'general' if not provided
-
-    if not title:
-        return {"error": "Invalid input"}, 200
-
+    payload = _parse_body(ItemCreate)
     db = get_db()
 
-    exists = db.execute("SELECT * FROM inventory WHERE id = ?", (id,)).fetchone()
+    if _find_title_conflict(db, payload.item) is not None:
+        raise ApiError("Item already exists", 409)
 
-    if not exists:
-        return {"error": "Item not found"}, 404
-    else:
-        new_count = count
-        db.execute(
-            "UPDATE inventory SET count = ?, title = ?, category = ? WHERE id = ?",
-            (new_count, title, category, id),
+    try:
+        cursor = db.execute(
+            "INSERT INTO inventory (title, count, condition, category, image) VALUES (?, ?, ?, ?, ?)",
+            (payload.item, payload.count, payload.condition, payload.category, payload.image or DEFAULT_IMAGE),
         )
         db.commit()
+    except sqlite3.IntegrityError as exc:
+        # Faengt den Race zwischen Pruefung und INSERT ab.
+        db.rollback()
+        raise ApiError("Item already exists", 409) from exc
 
-    return {"Item successfully updated": True}, 200
+    return jsonify(serialise_item(_fetch_item(db, cursor.lastrowid))), 201
 
-@app.route("/delete-item/<int:id>", methods=["DELETE"])
-def delete_item(id):
+
+@app.route("/update-item/<int:item_id>", methods=["PUT"])
+def update_item(item_id):
+    payload = _parse_body(ItemUpdate)
     db = get_db()
 
-    exists = db.execute("SELECT id FROM inventory WHERE id = ?", (id,)).fetchone()
+    existing = _fetch_item(db, item_id)
 
-    if not exists:
-        return {"error": "Item not found"}, 404
+    if existing is None:
+        raise ApiError("Item not found", 404)
 
-    db.execute("DELETE FROM inventory WHERE id = ?", (id,))
+    if _find_title_conflict(db, payload.title, exclude_id=item_id) is not None:
+        raise ApiError("Item already exists", 409)
+
+    # Nicht mitgeschickte Felder behalten ihren bisherigen Wert.
+    condition = payload.condition or existing["condition"]
+    image = payload.image if payload.image is not None else existing["image"]
+
+    try:
+        db.execute(
+            "UPDATE inventory SET title = ?, count = ?, category = ?, condition = ?, image = ? WHERE id = ?",
+            (payload.title, payload.count, payload.category, condition, image, item_id),
+        )
+        db.commit()
+    except sqlite3.IntegrityError as exc:
+        db.rollback()
+        raise ApiError("Item already exists", 409) from exc
+
+    return jsonify(serialise_item(_fetch_item(db, item_id))), 200
+
+
+@app.route("/delete-item/<int:item_id>", methods=["DELETE"])
+def delete_item(item_id):
+    db = get_db()
+
+    cursor = db.execute("DELETE FROM inventory WHERE id = ?", (item_id,))
     db.commit()
 
-    return {"Item successfully deleted": True}, 200
+    if cursor.rowcount == 0:
+        raise ApiError("Item not found", 404)
+
+    return jsonify({"deleted": item_id}), 200
+
 
 @app.route("/clear-inventory", methods=["DELETE"])
 def clear_inventory():
-    try:
-        db = get_db()
-        db.execute("DELETE FROM inventory")
-        db.commit()
-        return "db was cleared", 200
-    except Exception as e:
-        return f"Error {e}", 500
+    db = get_db()
+
+    cursor = db.execute("DELETE FROM inventory")
+    db.commit()
+
+    return jsonify({"deleted": cursor.rowcount}), 200

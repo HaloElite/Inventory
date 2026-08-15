@@ -1,4 +1,12 @@
 myvenv/
+.venv/
+venv/
 __pycache__/
 *.pyc
 .env
+
+# Lokale Datenbank gehoert nicht ins Repo
+instance/
+*.db
+
+.pytest_cache/
