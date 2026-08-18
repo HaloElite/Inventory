@@ -20,6 +20,9 @@ watch(
       dialogEl.value?.close();
     }
   },
+  {
+    immediate: true,
+  },
 );
 
 const onBackdropClick = (event: MouseEvent) => {

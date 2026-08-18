@@ -9,7 +9,7 @@ import InputCustom from '@/components/InputCustom.vue';
 import ButtonCustom from '@/components/ButtonCustom.vue';
 import InventoryList from '@/components/InventoryList.vue';
 
-const { shouldLoad, items, item, count, category, itemError, addItemMutation, clearInventoryMutation } = useInventory();
+const { shouldLoad, items, item, count, category, storage, itemError, addItemMutation, clearInventoryMutation } = useInventory();
 
 const clearErrorOnFocus = () => {
   itemError.value = false;
@@ -42,6 +42,13 @@ onMounted(() => (shouldLoad.value = true));
           ar-label-name="Gegenstand"
           placeholder="Spaten"
           v-model="item"
+        />
+        <InputCustom
+          @focus="clearErrorOnFocus()"
+          name="Gegenstand"
+          ar-label-name="Gegenstand"
+          placeholder="Lagerort"
+          v-model="storage"
         />
         <InputCustom name="Anzahl" ar-label-name="Anzahl" type="number" placeholder="Anzahl" v-model="count" />
         <ComboBox

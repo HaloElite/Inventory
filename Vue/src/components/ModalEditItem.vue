@@ -56,8 +56,8 @@ const onDelete = async () => {
     <template #default="{ dialogRef }">
       <h2 class="edit-modal__title">Item bearbeiten</h2>
       <div class="edit-modal__fields" ref="target">
-        <InputCustom name="Gegenstand" v-model="editTitle" />
-        <InputCustom name="Anzahl" type="number" v-model="editCount" />
+        <InputCustom name="Gegenstand" v-model="editTitle" ar-label-name="Gegenstand" />
+        <InputCustom name="Anzahl" type="number" v-model="editCount" ar-label-name="Anzahl" />
         <ComboBox
           name="Kategorie"
           dropdown-label-name="Kategorie"

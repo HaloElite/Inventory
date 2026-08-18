@@ -6,6 +6,7 @@ import { ref } from 'vue';
 const shouldLoad = ref<boolean>(false),
   item = ref<string>(''),
   count = ref<number>(1),
+  storage = ref<string>(''),
   itemError = ref<boolean>(false),
   category = ref<string>('general');
 
@@ -160,6 +161,7 @@ export const useInventory = () => {
     item,
     count,
     category,
+    storage,
     itemError,
 
     // Additional information

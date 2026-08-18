@@ -38,7 +38,7 @@ const deleteItem = (itemId: number) => {
 };
 
 const mapCategoryNames = (val: Category) => {
-  return CATEGORY_OPTIONS.find((el) => el.value === val)?.title || 'val';
+  return CATEGORY_OPTIONS.find((el) => el.value === val)?.title || '';
 };
 </script>
 <template>
@@ -71,7 +71,7 @@ const mapCategoryNames = (val: Category) => {
             :key="item.id"
             class="inventory-list__row"
             @click="setSelectedItem(item)"
-            @keydown.space="setSelectedItem(item)"
+            @keydown.space.prevent="setSelectedItem(item)"
             @keydown.enter="setSelectedItem(item)"
             tabindex="0"
           >
@@ -166,7 +166,7 @@ const mapCategoryNames = (val: Category) => {
 
           <span class="inventory-list__mobile-description">
             <StatusBadge :status="item.condition" />
-            <span>{{ item.category }}</span>
+            <span>{{ mapCategoryNames(item.category) }}</span>
           </span>
 
           <span class="inventory-list__mobile-footer">
